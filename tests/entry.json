@@ -1,8 +1,10 @@
 {
   "type": "entry",
-  "vehicle_id": "veh-123",
-  "slot_id": "slot-1",
-  "scanner_id": "scanner-1",
-  "rate_per_min_cents": 10,
-  "escrow_deposit_cents": 100
+  "vehicle_id": "TS09AB1234",
+  "slot_id": "P1-A1",
+  "scanner_id": "entry-gate-01",
+  "rate_per_min_cents": 15,
+  "escrow_deposit_cents": 500,
+  "ts": 1732611000,
+  "sig": "PLACEHOLDER_WILL_BE_COMPUTED_BY_HMAC_POST_SCRIPT"
 }
