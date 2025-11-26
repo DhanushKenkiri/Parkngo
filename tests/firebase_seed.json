@@ -1,53 +1,40 @@
 {
   "vehicles": {
     "TS09AB1234": {
-      "created_ts": 1700786400,
-      "last_session_id": "demo_session_01"
+      "plate_number": "TS09AB1234",
+      "owner_name": "Test Owner",
+      "created_ts": 1732611000,
+      "total_sessions": 1,
+      "last_session_id": null,
+      "entry_events": {
+        "entry_001": {
+          "event_id": "entry_001",
+          "timestamp": 1732611000,
+          "scanner_id": "entry-gate-01",
+          "slot_assigned": "P1-A1",
+          "session_created": null
+        }
+      },
+      "exit_events": {}
     }
   },
-  "sessions": {
-    "demo_session_01": {
+  "sessions": {},
+  "payments": {},
+  "events": {
+    "entry_001": {
+      "type": "entry",
       "vehicle_id": "TS09AB1234",
       "slot_id": "P1-A1",
-      "start_ts": 1700786400,
-      "end_ts": null,
-      "status": "awaiting_funding",
+      "scanner_id": "entry-gate-01",
+      "timestamp": 1732611000,
       "rate_per_min_cents": 15,
-      "accrued_cents": 0,
-      "released_cents": 0,
-      "escrow_deposit_cents": 500,
-      "payment_id": "demo_payment_01",
-      "last_tick_ts": null,
-      "percent_escrow_used": 0,
-      "percent_paid_of_accrued": 0,
-      "masumi": {
-        "blockchain_identifier": "demo_payment_01",
-        "network": "Preprod",
-        "agent_identifier": "your-agent-identifier"
-      }
+      "escrow_deposit_cents": 500
     }
   },
-  "payments": {
-    "demo_payment_01": {
-      "payment_id": "demo_payment_01",
-      "session_id": "demo_session_01",
-      "blockchain_identifier": "demo_payment_01",
-      "funded": false,
-      "created_ts": 1700786400,
-      "releases": {},
-      "masumi_payment": {
-        "blockchainIdentifier": "demo_payment_01",
-        "network": "Preprod",
-        "agentIdentifier": "your-agent-identifier",
-        "requestedFunds": [
-          {
-            "amount": "5000000",
-            "unit": "lovelace"
-          }
-        ]
-      }
-    }
-  },
-  "events": {},
-  "audit": {}
+  "parking_config": {
+    "default_rate_per_min_cents": 15,
+    "default_escrow_cents": 500,
+    "release_threshold_cents": 100,
+    "release_batch_limit_cents": 1000
+  }
 }
