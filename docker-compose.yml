@@ -1,0 +1,130 @@
+version: '3.8'
+services:
+  ingestor:
+    build: ./ingestor
+    environment:
+      - FIREBASE_CREDENTIALS_JSON=/run/secrets/firebase-adminsdk.json
+      - FIREBASE_DB_URL=${FIREBASE_DB_URL}
+      - HMAC_KEY=${HMAC_KEY}
+      - INGEST_PORT=${INGEST_PORT}
+    ports:
+      - "${INGEST_PORT}:${INGEST_PORT}"
+    volumes:
+      - ./secrets/firebase-adminsdk.json:/run/secrets/firebase-adminsdk.json:ro
+
+  payments_agent:
+    build: ./payments_agent
+    depends_on:
+      - masumi-payment-service
+    environment:
+      - FIREBASE_CREDENTIALS_JSON=/run/secrets/firebase-adminsdk.json
+      - FIREBASE_DB_URL=${FIREBASE_DB_URL}
+      - MASUMI_API_BASE_URL=${MASUMI_API_BASE_URL}
+      - MASUMI_API_KEY=${MASUMI_API_KEY}
+      - MASUMI_NETWORK=${MASUMI_NETWORK}
+      - MASUMI_AGENT_IDENTIFIER=${MASUMI_AGENT_IDENTIFIER}
+      - MASUMI_PAYMENT_POLL_SECONDS=${MASUMI_PAYMENT_POLL_SECONDS}
+      - PAYMENTS_PORT=${PAYMENTS_PORT}
+    ports:
+      - "${PAYMENTS_PORT}:${PAYMENTS_PORT}"
+    volumes:
+      - ./secrets/firebase-adminsdk.json:/run/secrets/firebase-adminsdk.json:ro
+
+  meter_worker:
+    build: ./meter_worker
+    environment:
+      - FIREBASE_CREDENTIALS_JSON=/run/secrets/firebase-adminsdk.json
+      - FIREBASE_DB_URL=${FIREBASE_DB_URL}
+      - TICK_INTERVAL_SECONDS=${TICK_INTERVAL_SECONDS}
+      - RELEASE_THRESHOLD_CENTS=${RELEASE_THRESHOLD_CENTS}
+      - RELEASE_BATCH_LIMIT_CENTS=${RELEASE_BATCH_LIMIT_CENTS}
+      - PAYMENTS_AGENT_URL=http://payments_agent:${PAYMENTS_PORT}
+    volumes:
+      - ./secrets/firebase-adminsdk.json:/run/secrets/firebase-adminsdk.json:ro
+
+  masumi-postgres-payment:
+    image: postgres:15
+    container_name: masumi-postgres-payment
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - masumi_postgres_data_payment:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  masumi-postgres-registry:
+    image: postgres:15
+    container_name: masumi-postgres-registry
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - masumi_postgres_data_registry:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  masumi-payment-service:
+    image: ghcr.io/masumi-network/masumi-payment-service:0.22.0
+    container_name: masumi-payment-service
+    depends_on:
+      masumi-postgres-payment:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@masumi-postgres-payment:5432/postgres?schema=public
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - ADMIN_KEY=${ADMIN_KEY}
+      - BLOCKFROST_API_KEY_PREPROD=${BLOCKFROST_API_KEY_PREPROD}
+      - SEED_ONLY_IF_EMPTY=TRUE
+    command: >
+      sh -c "apt-get update && apt-get install -y curl && npm run prisma:migrate && npm run prisma:seed && npm start"
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  masumi-registry-service:
+    image: ghcr.io/masumi-network/masumi-registry-service:0.22.0
+    container_name: masumi-registry-service
+    depends_on:
+      masumi-postgres-registry:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@masumi-postgres-registry:5432/postgres?schema=public
+      - ADMIN_KEY=${ADMIN_KEY}
+      - BLOCKFROST_API_KEY_PREPROD=${BLOCKFROST_API_KEY_PREPROD}
+      - SEED_ONLY_IF_EMPTY=TRUE
+    command: >
+      sh -c "apt-get update && apt-get install -y curl && npm run prisma:migrate && npm run prisma:seed && npm start"
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# Notes:
+# - Place Firebase service account JSON at ./secrets/firebase-adminsdk.json
+# - Masumi registry/payment services start automatically; provide the required secrets in .env
+
+volumes:
+  masumi_postgres_data_payment:
+  masumi_postgres_data_registry:

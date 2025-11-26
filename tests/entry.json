@@ -1,0 +1,8 @@
+{
+  "type": "entry",
+  "vehicle_id": "veh-123",
+  "slot_id": "slot-1",
+  "scanner_id": "scanner-1",
+  "rate_per_min_cents": 10,
+  "escrow_deposit_cents": 100
+}
