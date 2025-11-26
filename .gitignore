@@ -1,0 +1,6 @@
+# Ignore local secrets and sensitive material
+secrets/*
+!secrets/.gitkeep
+
+# Ignore macOS junk
+.DS_Store
