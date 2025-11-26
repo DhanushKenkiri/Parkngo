@@ -7,10 +7,7 @@
 abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art
 ```
 
-**Derived Address (Preprod):**
-```
-addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp
-```
+**Status:** ✅ FUNDED (Transaction: 35a7fad72e57951d9f69c34b6647f98e9cb0b87376e11f3bc33b03d71696474d)
 
 ## Selling Wallet (Needs ~10 tADA for transaction fees)
 
@@ -19,10 +16,7 @@ addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgj
 abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon able
 ```
 
-**Derived Address (Preprod):**
-```
-addr_test1qq9cqg6jcfjqhpqzl5pr9exzf3qpyfjx2wc7dwhz0h65zxjcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwqwaqtxm
-```
+**Important:** The Masumi containers will auto-generate wallets from these mnemonics on first start. Use the addresses printed in the container logs, or fund via the faucet using the address below once containers are running.
 
 ---
 

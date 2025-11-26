@@ -1,37 +1,38 @@
-# Wallet Funding Status
+# Wallet Funding Status - IMPORTANT UPDATE
 
 ## ✅ Purchase Wallet - FUNDED
-**Address:** `addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp`
-
 **Transaction Hash:** `35a7fad72e57951d9f69c34b6647f98e9cb0b87376e11f3bc33b03d71696474d`
 
-**Balance:** Sufficient tADA for escrow payments ✓
+The purchase wallet has been successfully funded with test ADA.
 
-## ⚠️ Selling Wallet - NEEDS FUNDING
-**Address:** `addr_test1qq9cqg6jcfjqhpqzl5pr9exzf3qpyfjx2wc7dwhz0h65zxjcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwqwaqtxm`
+## ⚠️ Selling Wallet Address - Use Container Logs
 
-**Status:** Needs ~10 tADA for transaction fees
+**The wallet addresses need to be derived from the mnemonics by the Masumi containers.**
 
-**Action Required:** Request funds from faucet at https://docs.cardano.org/cardano-testnet/tools/faucet/
+### Steps to Get Correct Addresses:
+
+1. **Start Masumi services:**
+   ```powershell
+   docker compose up masumi-payment-service masumi-registry-service
+   ```
+
+2. **Watch container logs for wallet addresses:**
+   ```powershell
+   docker compose logs -f masumi-payment-service | Select-String "address"
+   ```
+
+3. **The containers will print the actual preprod addresses** derived from the mnemonics in `.env`
+
+4. **Copy those addresses and fund them via the faucet**
 
 ---
 
-## Verification Links
+## Why Manual Address Derivation Doesn't Work
 
-**Purchase Wallet Explorer:**
-https://preprod.cardanoscan.io/address/addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp
+Cardano addresses require proper key derivation using the BIP32/BIP39 standard with Cardano-specific parameters. The Masumi payment service handles this correctly when it starts up with the configured mnemonics.
 
-**Transaction Confirmation:**
-https://preprod.cardanoscan.io/transaction/35a7fad72e57951d9f69c34b6647f98e9cb0b87376e11f3bc33b03d71696474d
+**Both wallet mnemonics are already configured in:**
+- `.env` (root)
+- `masumi-services/.env`
 
----
-
-## Next Steps
-
-1. ✅ Purchase wallet funded (can make escrow payments)
-2. ⏳ Fund selling wallet (~10 tADA for fees) at faucet
-3. ⏳ Wait 2-3 minutes for blockchain confirmation
-4. ✅ Start the full Docker stack
-5. ✅ Test payment flow via Firebase updates
-
-**Both wallets are already configured in `.env` and `masumi-services/.env` with the test mnemonics.**
+Just start the containers and use the addresses they print in the logs.
