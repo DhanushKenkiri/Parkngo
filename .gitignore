@@ -3,5 +3,9 @@ secrets/*
 !secrets/.gitkeep
 !secrets/firebase-service-account.template.json
 
+# Ignore environment files with real credentials
+.env
+masumi-services/.env
+
 # Ignore macOS junk
 .DS_Store
