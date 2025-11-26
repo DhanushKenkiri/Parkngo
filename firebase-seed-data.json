@@ -1,0 +1,32 @@
+{
+  "parking_spots": {
+    "A-01": {
+      "spot_id": "A-01",
+      "zone": "A",
+      "type": "premium",
+      "features": ["covered", "ev_charging"],
+      "occupied": false,
+      "last_updated": "2025-11-27T00:00:00Z",
+      "gpio_pin": 17,
+      "sensor_status": "active",
+      "current_session": null
+    },
+    "B-01": {
+      "spot_id": "B-01",
+      "zone": "B",
+      "type": "regular",
+      "features": ["covered"],
+      "occupied": false,
+      "last_updated": "2025-11-27T00:00:00Z",
+      "gpio_pin": 18,
+      "sensor_status": "active",
+      "current_session": null
+    }
+  },
+  "entries": {},
+  "exits": {},
+  "sessions": {},
+  "reservations": {},
+  "violations": {},
+  "disputes": {}
+}

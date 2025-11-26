@@ -1,11 +1,64 @@
-# Ignore local secrets and sensitive material
-secrets/*
-!secrets/.gitkeep
-!secrets/firebase-service-account.template.json
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Ignore environment files with real credentials
+# Environment variables
 .env
-masumi-services/.env
+.env.local
+.env.*.local
 
-# Ignore macOS junk
+# Firebase credentials
+secrets/
+*.json
+!firebase-seed-data.json
+parkngo-firebase-adminsdk.json
+
+# Cardano wallet keys
+*.skey
+*.vkey
+*.addr
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+logs/
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml

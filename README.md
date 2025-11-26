@@ -1,75 +1,156 @@
-# ParknGo Masumi Cloud Backend
+# ParknGo Multi-Agent Parking Payment System
 
-Cloud-only backend (Docker) where Firebase Realtime Database events kick off Masumi escrow flows. No frontend is included.
+**Professional blockchain-powered parking marketplace using Masumi Network**
 
-## Services
-- `ingestor`: HMAC-protected scanner ingest to create/update sessions in Firebase RTDB.
-- `payments_agent`: talks to the official Masumi payment service (GHCR images) to create escrow payments and release funds.
-- `meter_worker`: periodic accrual + release trigger that posts to the payments agent.
-- `masumi-payment-service` / `masumi-registry-service`: pulled straight from `ghcr.io/masumi-network/*` and orchestrated through the root `docker-compose.yml`.
+## 🎯 What We're Building
 
-## Prerequisites
-1. Firebase project with Realtime Database + admin service account JSON saved to `./secrets/firebase-adminsdk.json`.
-2. Masumi dev credentials:
-	- `ADMIN_KEY` and `ENCRYPTION_KEY` (32 bytes) for the payment service container.
-	- `MASUMI_AGENT_IDENTIFIER` issued by the registry.
-3. Blockfrost Preprod API key (`BLOCKFROST_API_KEY_PREPROD`).
-4. Optional: wallet mnemonics/addresses for purchaser/seller flows (leave blank to let Masumi auto-generate).
+A smart parking payment system where 7 AI agents coordinate through Masumi Network (Cardano blockchain) to handle reservations, dynamic pricing, route optimization, payment verification, security monitoring, and dispute resolution.
 
-## Environment
-Copy `.env.example` to `.env` (already provided) and fill **all** placeholders:
+**Simple Pitch:** "Reserve parking spots with guaranteed availability. If the spot isn't available, you get an automatic blockchain refund + penalty - no arguing with parking attendants."
 
-```dotenv
-MASUMI_API_KEY=masumi_admin_api_key_here
-ADMIN_KEY=masumi_admin_key_here
-ENCRYPTION_KEY=32_char_encryption_key_here
-BLOCKFROST_API_KEY_PREPROD=blockfrost_preprod_key_here
+## 🏗️ System Architecture
+
+```
+Hardware Layer (Raspberry Pi + IR Sensors)
+    ↓ (Firebase Realtime Database)
+Backend Layer (7 AI Agents + Flask API)
+    ↓ (Masumi Network - Blockchain Payments)
+Frontend Layer (Mobile/Web App)
 ```
 
-Leave wallet mnemonics empty if you want the payment container to generate them on first boot; copy the mnemonics from the container logs to keep funding ability.
+## 🤖 AI Agents
 
-## Running locally
-```powershell
-docker compose pull
-docker compose build
-docker compose up
+1. **Orchestrator** - Master coordinator (earns 0.4 ADA)
+2. **Spot Finder** - Scans 30 spots via Firebase (earns 0.3 ADA)
+3. **Pricing Agent** - Gemini AI dynamic pricing (earns 0.4 ADA)
+4. **Route Optimizer** - Walking routes (earns 0.2 ADA)
+5. **Payment Verifier** - Blockfrost blockchain verification (earns 0.2 ADA)
+6. **Security Guard** - Violation monitoring (earns 20% of fines)
+7. **Dispute Resolver** - Gemini AI arbitration (earns $2 per dispute)
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.11+
+- Docker & Docker Compose
+- Firebase project setup
+- Blockfrost API key
+- Gemini API key
+
+### Installation
+
+1. **Clone and setup:**
+```bash
+git clone <repo-url>
+cd Project-ParknGo
+pip install -r requirements.txt
 ```
 
-Notes:
-- Firebase admin JSON is bind-mounted into every Python service at `/run/secrets/firebase-adminsdk.json`.
-- Masumi registry/payment services have Postgres dependencies baked into the compose file and expose ports `3000/3001` locally for debugging.
+2. **Configure environment:**
+```bash
+cp .env.example .env
+# Edit .env with your credentials
+```
 
-## Acceptance test flow
-1. Simulate entry (signed POST) to create a session:
+3. **Setup Masumi Network:**
+```bash
+git clone https://github.com/masumi-network/masumi-services-dev-quickstart.git masumi
+cd masumi
+cp .env.example .env
+# Add Blockfrost API key to masumi/.env
+docker compose up -d
+```
 
-	```powershell
-	python helpers/hmac_post.py --url http://localhost:8080/ingest/scan --file tests/entry.json
-	```
+4. **Seed Firebase:**
+```bash
+python scripts/seed-firebase.py
+```
 
-2. Create an escrow payment tied to that session:
+5. **Start backend:**
+```bash
+python app.py
+```
 
-	```powershell
-	curl -X POST http://localhost:8081/create_payment \
-	  -H "Content-Type: application/json" \
-	  -d '{"session_id":"<session_id>"}'
-	```
+## 📡 API Endpoints
 
-3. Use the Masumi API/CLI (or payment container logs) to fund the blockchain identifier returned in step 2. Once funds reach `FundsLocked`, the payments agent marks the session `active` automatically.
+- `POST /api/v1/parking/reserve` - Create reservation
+- `GET /api/v1/parking/reservation/<id>` - Get reservation
+- `POST /api/v1/disputes/create` - Create dispute
+- `GET /api/v1/agents/earnings` - Agent earnings dashboard
+- `GET /health` - Health check
 
-4. Let the `meter_worker` tick (set `TICK_INTERVAL_SECONDS` low for faster demos). When accrued balance crosses thresholds it will ask the payments agent to submit Masumi results.
+Full API docs: http://localhost:5000/docs
 
-5. Simulate exit via another signed POST to `ingestor`. This will finalize the session and release escrow per meter calculations.
+## 🔧 Configuration
 
-## Firebase data layout (minimal)
-- `/vehicles/{vehicle_id}`
-- `/sessions/{session_id}`
-- `/payments/{payment_id}`
-- `/events/{event_id}`
-- `/audit/{audit_id}`
+### Firebase Setup
 
-## Tips
-- All currency values are stored as integer cents. Default rate per minute is `10` cents unless overridden on ingest payloads.
-- Never commit real credentials. Keep `./secrets` out of git and rotate keys regularly.
+1. Create Firebase project: `parkngo-ai`
+2. Download service account JSON → `secrets/parkngo-firebase-adminsdk.json`
+3. Import `firebase-seed-data.json` via Firebase Console
 
-## Helpers
-- `helpers/hmac_post.py` signs payloads with `HMAC_KEY` from `.env` to mimic scanner hardware.
+### Masumi Network
+
+1. Services run on Docker:
+   - Registry: http://localhost:3000
+   - Payment: http://localhost:3001
+2. Register agents: `python scripts/register-agents.py`
+
+### Gemini AI
+
+- Model: `gemini-1.5-flash` (fast, cost-effective)
+- Usage: Pricing, dispute resolution, fraud detection
+- Rate limit: 15 req/min (free tier)
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+pytest tests/
+
+# Integration tests
+pytest tests/test_reservation_flow.py
+
+# Load testing
+python tests/load_test.py --requests 100
+```
+
+## 📊 Tech Stack
+
+- **Backend:** Python 3.11, Flask
+- **Database:** Firebase Realtime Database
+- **AI:** Google Gemini 1.5 Flash
+- **Blockchain:** Cardano Preprod (via Masumi Network)
+- **API:** Blockfrost
+- **Deployment:** Docker, Gunicorn
+
+## 🔐 Security
+
+- Never commit `.env` or `secrets/` folder
+- Cardano wallet keys stored securely
+- Firebase service account credentials protected
+- API rate limiting enabled
+
+## 📖 Documentation
+
+- [Hardware Team Guide](HARDWARE_TEAM_README.md) - Raspberry Pi setup
+- [Backend Team Guide](BACKEND_TEAM_README.md) - Agent implementation
+- [Frontend Team Guide](FRONTEND_TEAM_README.md) - Mobile/web app
+- [Masumi Docs](https://docs.masumi.network)
+
+## 🤝 Team Structure
+
+- **Hardware:** Raspberry Pi + IR sensors → Firebase
+- **Backend:** 7 AI agents + Masumi payments (You)
+- **Frontend:** Mobile/web app → Customer interface
+
+## 📜 License
+
+MIT
+
+## 🆘 Support
+
+- Masumi Network: https://docs.masumi.network
+- Firebase: https://firebase.google.com/docs
+- Gemini AI: https://ai.google.dev/docs

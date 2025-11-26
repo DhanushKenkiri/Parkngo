@@ -1,8 +1,0 @@
-{
-  "type": "exit",
-  "vehicle_id": "TS09AB1234",
-  "slot_id": "P1-A1",
-  "scanner_id": "exit-gate-01",
-  "ts": 1732615200,
-  "sig": "PLACEHOLDER_WILL_BE_COMPUTED_BY_HMAC_POST_SCRIPT"
-}
