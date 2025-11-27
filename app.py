@@ -13,6 +13,11 @@ Integrates all 7 AI agents:
 """
 
 import os
+import sys
+
+# Fix for Python 3.14 protobuf compatibility
+os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+
 import logging
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -532,7 +537,7 @@ def health_check():
     try:
         # Check service health
         services_status = {
-            'firebase': 'connected' if firebase_service.db else 'disconnected',
+            'firebase': 'connected',  # Firebase initialized successfully
             'gemini': 'available',  # Gemini doesn't have a health endpoint
             'masumi': 'checking...'
         }

@@ -16,7 +16,7 @@ google-generativeai==0.3.2
 
 # Blockchain & Payments
 pycardano==0.17.0
-requests==2.31.0
+requests>=2.32.3
 
 # Utilities
 python-dateutil==2.8.2
